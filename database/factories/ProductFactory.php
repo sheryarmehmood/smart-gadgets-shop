@@ -1,0 +1,21 @@
+<?php
+
+namespace Database\factories;
+use App\Models\Product;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class ProductFactory extends Factory
+{
+    protected $model = Product::class;
+
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->word,
+            'description' => $this->faker->sentence,
+            'price' => $this->faker->randomFloat(2, 10, 200),
+            'stock' => $this->faker->numberBetween(1, 100),
+            'image' => 'https://via.placeholder.com/150',
+        ];
+    }
+}
