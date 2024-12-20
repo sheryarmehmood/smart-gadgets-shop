@@ -20,12 +20,17 @@ Route::get('/categories/{id}', [CategoryController::class, 'show'])->name('categ
 
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    
+    // Route::get('/payment', [OrderController::class, 'payment'])->name('orders.payment');
+    // Route::post('/payment/process', [OrderController::class, 'processPayment'])->name('orders.processPayment');
+    // Route::get('/order/confirmation', function () {
+    //     return view('order.confirmation');
+    // })->name('orders.confirmation');
+
     Route::get('/payment', [OrderController::class, 'payment'])->name('orders.payment');
     Route::post('/payment/process', [OrderController::class, 'processPayment'])->name('orders.processPayment');
-    Route::get('/order/confirmation', function () {
-        return view('orders.confirmation');
-    })->name('orders.confirmation');
-
+    Route::get('/order/confirmation', [OrderController::class, 'confirmation'])->name('orders.confirmation');
+    
 // });
 
 Auth::routes();
