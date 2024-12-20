@@ -38,6 +38,6 @@
             @endforeach
         </tbody>
     </table>
-    <a href="{{ route('orders.store') }}" class="btn btn-success">Place Order</a>
+    <a href="{{ route('orders.payment') }}" class="btn btn-success">Place Order</a>
 @endif
 @endsection
