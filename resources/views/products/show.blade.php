@@ -2,7 +2,7 @@
 
 @section('content')
 <h1 class="card-title">{{ $product->name }}</h1>
-<img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="img-fluid">
+<img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="img-fluid" style="width: 500px; height: 500px;">
 <p>{{ $product->description }}</p>
 <p>Price: ${{ number_format($product->price, 2) }}</p>
 <form action="{{ route('cart.store') }}" method="POST">
