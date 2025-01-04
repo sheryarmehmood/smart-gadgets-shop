@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-<h1>{{ $product->name }}</h1>
-<img src="{{ $product->image }}" alt="{{ $product->name }}" class="img-fluid">
+<h1 class="card-title">{{ $product->name }}</h1>
+<img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="img-fluid">
 <p>{{ $product->description }}</p>
 <p>Price: ${{ number_format($product->price, 2) }}</p>
 <form action="{{ route('cart.store') }}" method="POST">
