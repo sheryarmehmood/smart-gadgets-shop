@@ -31,6 +31,19 @@
             </div>
             <p class="product-description mt-3">{{ $product->description }}</p>
 
+             <!-- Product Category -->
+             <p class="product-category mt-2">
+    <strong>Categories:</strong>
+    @if($product->categories->isNotEmpty())
+        @foreach($product->categories as $category)
+            {{ $category->name }}{{ !$loop->last ? ', ' : '' }}
+        @endforeach
+    @else
+        No Categories
+    @endif
+</p>
+
+
             <!-- Quantity Selector and Add to Cart -->
             <form action="{{ route('cart.store') }}" method="POST" class="mt-4">
                 @csrf
