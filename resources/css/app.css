@@ -1,3 +1,32 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+.product-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+.product-rating span {
+    font-size: 1rem;
+}
+
+.product-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.product-description {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #555;
+}
+
+.additional-info p {
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.additional-info i {
+    margin-right: 8px;
+    font-size: 1.2rem;
+}
