@@ -35,10 +35,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/payment', [OrderController::class, 'payment'])->name('orders.payment');
     Route::post('/payment/process', [OrderController::class, 'processPayment'])->name('orders.processPayment');
-    Route::get('/order/confirmation', [OrderController::class, 'confirmation'])->name('orders.confirmation');
+    Route::get('/orders/confirmation', [OrderController::class, 'confirmation'])->name('orders.confirmation');
     
 });
 
 Auth::routes();
 
-// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

@@ -28,7 +28,7 @@
         <h5 class="text-end">Total: ${{ number_format($totalPrice, 2) }}</h5>
     </div>
 
-    <form action="{{ route('orders.processPayment') }}" method="POST">
+    <form id="payment-form" action="{{ route('orders.processPayment') }}" method="POST">
         @csrf
         <h4>Your Details:</h4>
         <div class="mb-3">
@@ -40,29 +40,58 @@
             <input type="email" name="email" id="email" class="form-control" required>
         </div>
         <div class="mb-3">
-            <label for="phone" class="form-label">Phone Number</label>
-            <input type="text" name="phone" id="phone" class="form-control" required>
-        </div>
-        <div class="mb-3">
             <label for="address" class="form-label">Shipping Address</label>
             <textarea name="address" id="address" class="form-control" rows="3" required></textarea>
         </div>
 
         <h4>Payment Method:</h4>
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="payment_method" value="credit_card" id="credit_card" required>
-            <label class="form-check-label" for="credit_card">Credit Card</label>
+        <div id="card-element" class="form-control">
+            <!-- Stripe Elements will inject the Card Element here -->
         </div>
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="payment_method" value="paypal" id="paypal" required>
-            <label class="form-check-label" for="paypal">PayPal</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="payment_method" value="cash_on_delivery" id="cash_on_delivery" required>
-            <label class="form-check-label" for="cash_on_delivery">Cash on Delivery</label>
-        </div>
+        <div id="card-errors" class="text-danger mt-2" role="alert"></div>
 
-        <button type="submit" class="btn btn-primary mt-3">Submit Payment</button>
+        <button type="submit" class="btn btn-primary mt-3" id="submit-button">Submit Payment</button>
     </form>
 </div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const stripe = Stripe("{{ env('STRIPE_KEY') }}");
+    const elements = stripe.elements();
+    const cardElement = elements.create('card');
+    cardElement.mount('#card-element');
+
+    const form = document.getElementById('payment-form');
+    const submitButton = document.getElementById('submit-button');
+
+    form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        submitButton.disabled = true;
+
+        const { paymentMethod, error } = await stripe.createPaymentMethod({
+            type: 'card',
+            card: cardElement,
+            billing_details: {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+            },
+        });
+
+        if (error) {
+            document.getElementById('card-errors').textContent = error.message;
+            submitButton.disabled = false;
+        } else {
+            // Attach the PaymentMethod ID to the form and submit
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'payment_method_id';
+            hiddenInput.value = paymentMethod.id;
+            form.appendChild(hiddenInput);
+
+            form.submit();
+        }
+    });
+});
+</script>
 @endsection
