@@ -29,8 +29,7 @@ class ProductFactory extends Factory
             'price' => $this->faker->randomFloat(2, 10, 200), // Random price between $10 and $200
             'stock' => $this->faker->numberBetween(1, 50), // Stock between 1 and 50
             'image' => $gadget['image'], // Local image path
-            'color' => $this->faker->randomElement(['Red', 'Blue', 'Black', 'White', 'Green']), // Random color
-            'category_id' => $this->faker->randomElement([1, 2, 3, 4, 5]), // Random category_id from 1 to 5
+            'color' => $this->faker->randomElement(['Black', 'White']), // Random color
         ];
     }
 }

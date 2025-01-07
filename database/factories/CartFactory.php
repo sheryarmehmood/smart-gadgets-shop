@@ -12,7 +12,8 @@ class CartFactory extends Factory
     {
         return [
             'user_id' => \App\Models\User::factory(),
-            'product_id' => \App\Models\Product::factory(),
+            // 'product_id' => \App\Models\Product::factory(),
+            'product_id' => \App\Models\Product::inRandomOrder()->first()->id, // Use an existing product
             'quantity' => $this->faker->numberBetween(1, 3),
         ];
     }
