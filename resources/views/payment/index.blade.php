@@ -45,10 +45,21 @@
         </div>
 
         <h4>Payment Method:</h4>
-        <div id="card-element" class="form-control">
-            <!-- Stripe Elements will inject the Card Element here -->
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="payment_method" id="payment_cod" value="Cash on Delivery" required>
+            <label class="form-check-label" for="payment_cod">Cash on Delivery</label>
         </div>
-        <div id="card-errors" class="text-danger mt-2" role="alert"></div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="payment_method" id="payment_card" value="Card Payment" required>
+            <label class="form-check-label" for="payment_card">Credit/Debit Card</label>
+        </div>
+
+        <div id="card-element-container" class="mt-3" style="display: none;">
+            <div id="card-element" class="form-control">
+                <!-- Stripe Elements will inject the Card Element here -->
+            </div>
+            <div id="card-errors" class="text-danger mt-2" role="alert"></div>
+        </div>
 
         <button type="submit" class="btn btn-primary mt-3" id="submit-button">Submit Payment</button>
     </form>
@@ -64,33 +75,51 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const form = document.getElementById('payment-form');
     const submitButton = document.getElementById('submit-button');
+    const cardElementContainer = document.getElementById('card-element-container');
+    const paymentMethodRadios = document.querySelectorAll('input[name="payment_method"]');
+
+    // Show or hide the card element container based on selected payment method
+    paymentMethodRadios.forEach(radio => {
+        radio.addEventListener('change', function () {
+            if (this.value === 'Card Payment') {
+                cardElementContainer.style.display = 'block';
+            } else {
+                cardElementContainer.style.display = 'none';
+            }
+        });
+    });
 
     form.addEventListener('submit', async function (event) {
         event.preventDefault();
         submitButton.disabled = true;
 
-        const { paymentMethod, error } = await stripe.createPaymentMethod({
-            type: 'card',
-            card: cardElement,
-            billing_details: {
-                name: document.getElementById('name').value,
-                email: document.getElementById('email').value,
-            },
-        });
+        const selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
 
-        if (error) {
-            document.getElementById('card-errors').textContent = error.message;
-            submitButton.disabled = false;
-        } else {
+        if (selectedPaymentMethod === 'Card Payment') {
+            const { paymentMethod, error } = await stripe.createPaymentMethod({
+                type: 'card',
+                card: cardElement,
+                billing_details: {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                },
+            });
+
+            if (error) {
+                document.getElementById('card-errors').textContent = error.message;
+                submitButton.disabled = false;
+                return;
+            }
+
             // Attach the PaymentMethod ID to the form and submit
             const hiddenInput = document.createElement('input');
             hiddenInput.type = 'hidden';
             hiddenInput.name = 'payment_method_id';
             hiddenInput.value = paymentMethod.id;
             form.appendChild(hiddenInput);
-
-            form.submit();
         }
+
+        form.submit();
     });
 });
 </script>

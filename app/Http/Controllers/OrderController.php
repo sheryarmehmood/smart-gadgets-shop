@@ -48,11 +48,6 @@ class OrderController extends Controller
         return redirect()->route('orders.index')->with('success', 'Order placed successfully!');
     }
 
-    // public function payment()
-    // {
-    //     return view('payment.index');
-    // }
-
     
     public function payment()
     {
@@ -66,99 +61,141 @@ class OrderController extends Controller
     }
 
 
+
     // public function processPayment(Request $request)
     // {
     //     $validatedData = $request->validate([
     //         'name' => 'required|string|max:255',
     //         'email' => 'required|email|max:255',
-    //         'phone' => 'required|string|max:15',
     //         'address' => 'required|string',
-    //         'payment_method' => 'required|string|in:credit_card,paypal,cash_on_delivery',
+    //         'payment_method_id' => 'required|string',
     //     ]);
     
-    //     // Simulating order creation
-    //     $orderId = uniqid('ORDER_');
-    //     $totalAmount = 100.00; // Example: Replace with actual calculation
+      
     
-    //     // Set session data for confirmation
-    //     session([
-    //         'customer_name' => $validatedData['name'],
-    //         'customer_email' => $validatedData['email'],
-    //         'order_id' => $orderId,
-    //         'payment_method' => $validatedData['payment_method'],
-    //         'total_amount' => $totalAmount,
-    //     ]);
-    
-    //     // Redirect to confirmation page
-    //     return redirect()->route('orders.confirmation');
-    // }
 
+    //     // Fetch cart items and calculate total
+    //     $cartItems = Cart::where('user_id', Auth::id())->get();
+    //     $totalAmount = $cartItems->sum(function ($item) {
+    //         return $item->product->price * $item->quantity;
+    //     });
+    
+
+    //     try {
+    //         // Set Stripe API key
+    //         Stripe::setApiKey(env('STRIPE_SECRET'));
+    
+    //         // Create a PaymentIntent
+    //         $paymentIntent = PaymentIntent::create([
+    //             'amount' => $totalAmount * 100, // Amount in cents
+    //             'currency' => 'usd',
+    //             'payment_method' => $request->payment_method_id,
+    //             'confirmation_method' => 'manual',
+    //             'confirm' => true,
+    //             'return_url' => route('orders.confirmation'), // Add the return URL
+    //         ]);
+    
+    //         if ($paymentIntent->status === 'succeeded') {
+    //             // Process the successful payment (e.g., save order details)
+    //             $order = Order::create([
+    //                 'user_id' => Auth::id(),
+    //                 'total_price' => $totalAmount,
+    //                 'status' => 'paid',
+    //             ]);
+    
+    //             foreach ($cartItems as $cartItem) {
+    //                 OrderItem::create([
+    //                     'order_id' => $order->id,
+    //                     'product_id' => $cartItem->product_id,
+    //                     'quantity' => $cartItem->quantity,
+    //                     'price' => $cartItem->product->price,
+    //                 ]);
+    //             }
+
+    //               // Set session data for confirmation
+    //               session([
+    //                 'order_id' => $order->id,
+    //                 'customer_name' => $validatedData['name'],
+    //                 'customer_email' => $validatedData['email'],
+    //                 'total_amount' => $totalAmount,
+    //             ]);
+    
+    //             // Clear the cart
+    //             Cart::where('user_id', Auth::id())->delete();
+    
+    //             return redirect()->route('orders.confirmation');
+    //         } else {
+    //             return redirect($paymentIntent->next_action->redirect_to_url->url);
+    //         }
+    //     } catch (\Exception $e) {
+    //         return back()->withErrors(['error' => 'Payment error: ' . $e->getMessage()]);
+    //     }
+    // }
 
     public function processPayment(Request $request)
     {
+        // dd($request->all());
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'address' => 'required|string',
-            'payment_method_id' => 'required|string',
+            'payment_method' => 'required|string|in:Cash on Delivery,Card Payment',
+            'payment_method_id' => 'nullable|string', // Only required for card payments
         ]);
-    
-      
-    
 
         // Fetch cart items and calculate total
         $cartItems = Cart::where('user_id', Auth::id())->get();
         $totalAmount = $cartItems->sum(function ($item) {
             return $item->product->price * $item->quantity;
         });
-    
 
         try {
-            // Set Stripe API key
-            Stripe::setApiKey(env('STRIPE_SECRET'));
-    
-            // Create a PaymentIntent
-            $paymentIntent = PaymentIntent::create([
-                'amount' => $totalAmount * 100, // Amount in cents
-                'currency' => 'usd',
-                'payment_method' => $request->payment_method_id,
-                'confirmation_method' => 'manual',
-                'confirm' => true,
-                'return_url' => route('orders.confirmation'), // Add the return URL
-            ]);
-    
-            if ($paymentIntent->status === 'succeeded') {
-                // Process the successful payment (e.g., save order details)
-                $order = Order::create([
-                    'user_id' => Auth::id(),
-                    'total_price' => $totalAmount,
-                    'status' => 'paid',
+            if ($validatedData['payment_method'] === 'Card Payment') {
+                // Process Stripe payment
+                Stripe::setApiKey(env('STRIPE_SECRET'));
+                $paymentIntent = PaymentIntent::create([
+                    'amount' => $totalAmount * 100, // Amount in cents
+                    'currency' => 'usd',
+                    'payment_method' => $validatedData['payment_method_id'],
+                    'confirmation_method' => 'manual',
+                    'confirm' => true,
+                    'return_url' => route('orders.confirmation'), // Add the return URL
                 ]);
-    
-                foreach ($cartItems as $cartItem) {
-                    OrderItem::create([
-                        'order_id' => $order->id,
-                        'product_id' => $cartItem->product_id,
-                        'quantity' => $cartItem->quantity,
-                        'price' => $cartItem->product->price,
-                    ]);
-                }
 
-                  // Set session data for confirmation
+                if ($paymentIntent->status !== 'succeeded') {
+                    return redirect($paymentIntent->next_action->redirect_to_url->url);
+                }
+            }
+
+            // Save order regardless of payment method
+            $order = Order::create([
+                'user_id' => Auth::id(),
+                'total_price' => $totalAmount,
+                'status' => $validatedData['payment_method'] === 'Card Payment' ? 'paid' : 'pending',
+            ]);
+
+            foreach ($cartItems as $cartItem) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $cartItem->product_id,
+                    'quantity' => $cartItem->quantity,
+                    'price' => $cartItem->product->price,
+                ]);
+            }
+
+             // Set session data for confirmation
                   session([
                     'order_id' => $order->id,
                     'customer_name' => $validatedData['name'],
                     'customer_email' => $validatedData['email'],
+                    'payment_method' => $validatedData['payment_method'],
                     'total_amount' => $totalAmount,
                 ]);
-    
-                // Clear the cart
-                Cart::where('user_id', Auth::id())->delete();
-    
-                return redirect()->route('orders.confirmation');
-            } else {
-                return redirect($paymentIntent->next_action->redirect_to_url->url);
-            }
+
+            // Clear the cart
+            Cart::where('user_id', Auth::id())->delete();
+
+            return redirect()->route('orders.confirmation');
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Payment error: ' . $e->getMessage()]);
         }
@@ -166,146 +203,24 @@ class OrderController extends Controller
 
 
     public function confirmation()
-{
-    $orderId = session('order_id'); // Retrieve the order ID from the session
-    // $order = Order::with('items')->find($orderId); // Fetch the order and related items
-    $order = Order::with('items.product')->find($orderId);
-    // dd($order);
+    {
+        $orderId = session('order_id'); // Retrieve the order ID from the session
+        // $order = Order::with('items')->find($orderId); // Fetch the order and related items
+        $order = Order::with('items.product')->find($orderId);
+        // dd($order);
 
-    if (!$order) {
-        return redirect()->route('home')->withErrors(['error' => 'Order not found']);
+        if (!$order) {
+            return redirect()->route('home')->withErrors(['error' => 'Order not found']);
+        }
+
+        return view('orders.confirmation', [
+            'order' => $order,
+            'customer_name' => session('customer_name'),
+            'customer_email' => session('customer_email'),
+            'payment_method' => session('payment_method'),
+            'total_amount' => session('total_amount', '0.00'),
+        ]);
     }
-
-    return view('orders.confirmation', [
-        'order' => $order,
-        'customer_name' => session('customer_name'),
-        'customer_email' => session('customer_email'),
-        'total_amount' => session('total_amount', '0.00'),
-    ]);
-}
-
-
-
-    //  public function confirmation()
-    // {
-    //     return view('orders.confirmation', [
-    //         'customer_name' => session('customer_name'),
-    //         'customer_email' => session('customer_email'),
-    //         'total_amount' => session('total_amount', '0.00'),
-    //     ]);
-    // }
-
-
-    // public function processPayment(Request $request)
-    // {
-    //     dd($request->all());
-    //     $validatedData = $request->validate([
-    //         'name' => 'required|string|max:255',
-    //         'email' => 'required|email|max:255',
-    //         'phone' => 'required|string|max:15',
-    //         'address' => 'required|string',
-    //         'payment_method' => 'required|string|in:credit_card,paypal,cash_on_delivery',
-    //     ]);
-    
-    //     // Fetch cart items and calculate total
-    //     $cartItems = Cart::where('user_id', Auth::id())->get();
-    //     $totalAmount = $cartItems->sum(function ($item) {
-    //         return $item->product->price * $item->quantity;
-    //     });
-    
-    //     // Create the order
-    //     $order = Order::create([
-    //         'user_id' => Auth::id(),
-    //         'total_price' => $totalAmount,
-    //         'status' => 'pending',
-    //     ]);
-    
-    //     // Save order items
-    //     foreach ($cartItems as $cartItem) {
-    //         OrderItem::create([
-    //             'order_id' => $order->id,
-    //             'product_id' => $cartItem->product_id,
-    //             'quantity' => $cartItem->quantity,
-    //             'price' => $cartItem->product->price,
-    //         ]);
-    //     }
-    
-    //     // Clear the cart
-    //     Cart::where('user_id', Auth::id())->delete();
-    
-    //     // Set session data
-    //     session([
-    //         'customer_name' => $validatedData['name'],
-    //         'customer_email' => $validatedData['email'],
-    //         'order_id' => $order->id, // Use the actual order ID
-    //         'payment_method' => $validatedData['payment_method'],
-    //         'total_amount' => $totalAmount,
-    //     ]);
-    
-    //     return redirect()->route('orders.confirmation');
-    // }
-
-
-
-    // public function confirmation()
-    // {
-    //     $orderId = session('order_id');
-    
-    //     // Redirect if no order ID is found in the session
-    //     if (!$orderId) {
-    //         return redirect()->route('cart.index')->with('error', 'No order found.');
-    //     }
-    
-    //     // Fetch the order and its related items
-    //     $order = Order::with('items.product')->find($orderId);
-    
-    //     // Redirect if the order is not found
-    //     if (!$order) {
-    //         return redirect()->route('cart.index')->with('error', 'Order not found in the database.');
-    //     }
-    
-    //     // Pass data to the view
-    //     return view('orders.confirmation', [
-    //         'order' => $order,
-    //         'customer_name' => session('customer_name', 'Customer'),
-    //         'customer_email' => session('customer_email', 'example@example.com'),
-    //         'payment_method' => session('payment_method', 'N/A'),
-    //         'total_amount' => $order->total_price,
-    //     ]);
-    // }
-    
-    //     public function confirmation()
-    // {
-    //     return view('orders.confirmation')->with('message', 'Your payment was successful!');
-    // }
-
-
-    // public function confirmation()
-    // {
-    //     $orderId = session('order_id');
-
-    //     // Check if the order_id exists in the session
-    //     if (!$orderId) {
-    //         return redirect()->route('cart.index')->with('error', 'No order found.');
-    //     }
-
-    //     // Fetch the order and its related items and products
-    //     $order = Order::with('items.product')->where('id', $orderId)->first();
-
-    //     // If the order is not found in the database
-    //     if (!$order) {
-    //         return redirect()->route('cart.index')->with('error', 'Order not found in the database.');
-    //     }
-
-    //     // Pass data to the view
-    //     return view('orders.confirmation', [
-    //         'order' => $order,
-    //         'customer_name' => session('customer_name', 'Customer'),
-    //         'customer_email' => session('customer_email', 'example@example.com'),
-
-    //         'total_amount' => $order->total_price,
-    //     ]);
-    // }
 
     
 }
