@@ -29,7 +29,6 @@
     </table>
 
     <p><strong>Total Amount:</strong> ${{ number_format($total_amount, 2) }}</p>
-    <p><strong>Payment Method:</strong> {{ ucfirst($payment_method) }}</p>
 
     <a href="{{ route('home') }}" class="btn btn-primary">Back to Home</a>
 </div>

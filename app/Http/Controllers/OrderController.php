@@ -103,12 +103,16 @@ class OrderController extends Controller
             'payment_method_id' => 'required|string',
         ]);
     
+      
+    
+
         // Fetch cart items and calculate total
         $cartItems = Cart::where('user_id', Auth::id())->get();
         $totalAmount = $cartItems->sum(function ($item) {
             return $item->product->price * $item->quantity;
         });
     
+
         try {
             // Set Stripe API key
             Stripe::setApiKey(env('STRIPE_SECRET'));
@@ -139,11 +143,19 @@ class OrderController extends Controller
                         'price' => $cartItem->product->price,
                     ]);
                 }
+
+                  // Set session data for confirmation
+                  session([
+                    'order_id' => $order->id,
+                    'customer_name' => $validatedData['name'],
+                    'customer_email' => $validatedData['email'],
+                    'total_amount' => $totalAmount,
+                ]);
     
                 // Clear the cart
                 Cart::where('user_id', Auth::id())->delete();
     
-                return redirect()->route('orders.confirmation')->with('success', 'Payment successful and order placed!');
+                return redirect()->route('orders.confirmation');
             } else {
                 return redirect($paymentIntent->next_action->redirect_to_url->url);
             }
@@ -153,7 +165,37 @@ class OrderController extends Controller
     }
 
 
-    
+    public function confirmation()
+{
+    $orderId = session('order_id'); // Retrieve the order ID from the session
+    // $order = Order::with('items')->find($orderId); // Fetch the order and related items
+    $order = Order::with('items.product')->find($orderId);
+    // dd($order);
+
+    if (!$order) {
+        return redirect()->route('home')->withErrors(['error' => 'Order not found']);
+    }
+
+    return view('orders.confirmation', [
+        'order' => $order,
+        'customer_name' => session('customer_name'),
+        'customer_email' => session('customer_email'),
+        'total_amount' => session('total_amount', '0.00'),
+    ]);
+}
+
+
+
+    //  public function confirmation()
+    // {
+    //     return view('orders.confirmation', [
+    //         'customer_name' => session('customer_name'),
+    //         'customer_email' => session('customer_email'),
+    //         'total_amount' => session('total_amount', '0.00'),
+    //     ]);
+    // }
+
+
     // public function processPayment(Request $request)
     // {
     //     dd($request->all());
@@ -204,20 +246,6 @@ class OrderController extends Controller
     // }
 
 
-    
-
-
-    //  public function confirmation()
-    // {
-    //     return view('orders.confirmation', [
-    //         'customer_name' => session('customer_name', 'Customer'),
-    //         'customer_email' => session('customer_email', 'example@example.com'),
-    //         'order_id' => session('order_id', 'N/A'),
-    //         'payment_method' => session('payment_method', 'N/A'),
-    //         'total_amount' => session('total_amount', '0.00'),
-    //     ]);
-    // }
-
 
     // public function confirmation()
     // {
@@ -246,10 +274,10 @@ class OrderController extends Controller
     //     ]);
     // }
     
-    public function confirmation()
-{
-    return view('orders.confirmation')->with('message', 'Your payment was successful!');
-}
+    //     public function confirmation()
+    // {
+    //     return view('orders.confirmation')->with('message', 'Your payment was successful!');
+    // }
 
 
     // public function confirmation()
@@ -274,7 +302,7 @@ class OrderController extends Controller
     //         'order' => $order,
     //         'customer_name' => session('customer_name', 'Customer'),
     //         'customer_email' => session('customer_email', 'example@example.com'),
-    //         'payment_method' => session('payment_method', 'N/A'),
+
     //         'total_amount' => $order->total_price,
     //     ]);
     // }
