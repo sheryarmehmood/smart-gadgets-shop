@@ -148,7 +148,7 @@ class OrderController extends Controller
         $totalAmount = $cartItems->sum(function ($item) {
             return $item->product->price * $item->quantity;
         });
-
+        $paymentStatus = '';
         try {
             if ($validatedData['payment_method'] === 'Card Payment') {
                 // Process Stripe payment
@@ -161,17 +161,27 @@ class OrderController extends Controller
                     'confirm' => true,
                     'return_url' => route('orders.confirmation'), // Add the return URL
                 ]);
+                
+                
+                if ($paymentIntent->status === 'succeeded') {
+                    $paymentStatus = 'Paid';
+                }
 
                 if ($paymentIntent->status !== 'succeeded') {
                     return redirect($paymentIntent->next_action->redirect_to_url->url);
                 }
             }
 
+           
+            if ($validatedData['payment_method'] === 'Cash on Delivery') {
+                $paymentStatus = 'COD'; // Cash on Delivery status
+            }
+
             // Save order regardless of payment method
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'total_price' => $totalAmount,
-                'status' => $validatedData['payment_method'] === 'Card Payment' ? 'paid' : 'pending',
+                'status' => $paymentStatus,
             ]);
 
             foreach ($cartItems as $cartItem) {
