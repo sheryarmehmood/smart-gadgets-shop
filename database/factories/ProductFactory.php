@@ -13,11 +13,8 @@ class ProductFactory extends Factory
     {
         $gadgets = [
             ['name' => 'Electric Lunchboxes Deal', 'image' => 'images/2 Electric Lunchboxes ki DEAL.jpg'],
-            ['name' => 'Automatic Water Dispenser (2)', 'image' => 'images/AUTOMATIC WATER DISPENSER (2).jpg'],
             ['name' => 'Automatic Water Dispenser', 'image' => 'images/AUTOMATIC WATER DISPENSER.jpg'],
-            ['name' => 'Backlit Mini Keyboard (2)', 'image' => 'images/BACK LIT MINI KEYBOARD (2).jpg'],
             ['name' => 'Backlit Mini Keyboard', 'image' => 'images/BACK LIT MINI KEYBOARD.jpg'],
-            ['name' => 'Wireless Aluminum Speakers (2)', 'image' => 'images/2 Coin Wireless Aluminum Speakers (2).jpg'],
             ['name' => 'Wireless Aluminum Speakers', 'image' => 'images/2 Coin Wireless Aluminum Speakers.jpg'],
         ];
 
