@@ -16,6 +16,13 @@
         margin: 0;
     }
 
+    .hero-banner {
+        width: 100%; /* Full width */
+        height: auto; /* Maintain aspect ratio */
+        object-fit: cover; /* Ensures the image is fully visible */
+        margin-bottom: 20px; /* Adds spacing below the banner */
+    }
+
     .product-card {
         border: 1px solid #ddd;
         overflow: hidden;
@@ -98,10 +105,17 @@
     }
 </style>
 
-<div class="container py-4">
-    <div class="section-header mb-5">
-        <div class="section-tag">Gadgets</div>
-        <h2 class="section-title">Explore Our Products</h2>
+
+<div class="container-fluid px-0">
+    <!-- Hero Banner -->
+    <div>
+        <img src="{{ asset('images/banner.png') }}" alt="Hero Banner" class="hero-banner">
+    </div>
+
+  <div class="container py-4">
+    <div class="section-header mb-5 text-center">
+        <!-- <div class="section-tag">Gadgets</div> -->
+        <h2 class="section-title">Explore Our <span class="section-tag">Gadgets</span></h2>
     </div>
 
     <div class="row justify-content-center g-4">
@@ -109,7 +123,11 @@
             <div class="col-6 col-md-4 col-lg-3 d-flex justify-content-center">
                 <div class="product-card">
                     <div class="product-image">
-                        <img src="{{ $product->image }}" class="card-img-top" alt="{{ $product->name }}">
+                    <a href="{{ route('products.show', $product->id) }}" class="text-decoration-none">
+    <img src="{{ $product->image }}" class="card-img-top" alt="{{ $product->name }}">
+</a>
+
+                        <!-- <img src="{{ $product->image }}" class="card-img-top" alt="{{ $product->name }}"> -->
                         @if($product->is_new)
                             <span class="new-badge">NEW</span>
                         @endif
@@ -117,7 +135,7 @@
                     <div class="card-body my-2">
                         <h6 class="card-title text-center">
                             <a href="{{ route('products.show', $product->id) }}" class="text-decoration-none text-dark">
-                                {{ $product->name }}
+                                <strong>{{ $product->name }}</strong>
                             </a>
                         </h6>
                         <div class="d-flex justify-content-center align-items-center gap-2">
@@ -159,5 +177,6 @@
             </ul>
         </nav>
     </div>
+ </div>
 </div>
 @endsection

@@ -3,7 +3,7 @@
 @section('content')
 <div class="container my-2">
     <div class="text-center">
-        <h1 class="mb-4">Order Confirmed !</h1>
+        <h1 class="mt-5 mb-3">Order Confirmed !</h1>
         <p>Thank you for your order</p>
         <p>Your Order (ID: <strong>{{ $order->id }}</strong>) has been confirmed.</p>
     </div>
