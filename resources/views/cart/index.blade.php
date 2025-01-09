@@ -31,12 +31,12 @@
                     <tbody>
                         @foreach($cartItems as $item)
                             <tr>
-                                <td>
-                                    <!-- <img src="{{ $item->product->image_url }}" alt="{{ $item->product->name }}" class="img-fluid rounded me-3" style="width: 100px; height: 80px;"> -->
+                                <td class="align-middle">
+                                    <img src="{{ $item->product->image }}" alt="{{ $item->product->name }}" class="img-fluid mx-3" style="width: 100px; height: 80px;">
                                     {{ $item->product->name }}
                                 </td>
-                                <td>${{ number_format($item->product->price, 2) }}</td>
-                                <td>
+                                <td class="align-middle">${{ number_format($item->product->price, 2) }}</td>
+                                <td class="align-middle">
                                 {{ $item->quantity }}
                                     <!-- <form action="{{ route('cart.update', $item->id) }}" method="POST" class="d-inline-flex"> -->
                                         <!-- @csrf -->
@@ -45,9 +45,9 @@
                                         <!-- <button type="submit" class="btn btn-sm btn-primary">Update</button> -->
                                     <!-- </form> -->
                                 </td>
-                                <td>${{ number_format($item->product->price * $item->quantity, 2) }}</td>
+                                <td class="align-middle">${{ number_format($item->product->price * $item->quantity, 2) }}</td>
 
-                                <td class="text-center">
+                                <td class="text-center align-middle">
                                     <form action="{{ route('cart.destroy', $item->id) }}" method="POST" style="display: inline;">
                                         @csrf
                                         @method('DELETE')

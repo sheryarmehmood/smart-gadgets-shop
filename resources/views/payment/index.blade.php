@@ -17,10 +17,14 @@
             <tbody>
                 @foreach ($cartItems as $item)
                     <tr>
-                        <td>{{ $item->product->name }}</td>
-                        <td>${{ number_format($item->product->price, 2) }}</td>
-                        <td>{{ $item->quantity }}</td>
-                        <td>${{ number_format($item->product->price * $item->quantity, 2) }}</td>
+                        <!-- <td>{{ $item->product->name }}</td> -->
+                        <td class="align-middle">
+                            <img src="{{ $item->product->image }}" alt="{{ $item->product->name }}" class="img-fluid mx-3" style="width: 100px; height: 80px;">
+                            {{ $item->product->name }}
+                        </td>
+                        <td class="align-middle">${{ number_format($item->product->price, 2) }}</td>
+                        <td class="align-middle">{{ $item->quantity }}</td>
+                        <td class="align-middle">${{ number_format($item->product->price * $item->quantity, 2) }}</td>
                     </tr>
                 @endforeach
             </tbody>
