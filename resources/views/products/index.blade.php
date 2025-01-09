@@ -34,7 +34,7 @@ s
 }
 
 .product-image img {
-    width: 100%; /* Full width of the card */
+    width: 200px; /* Full width of the card */
     height: 200px; /* Fixed height for images */
     object-fit: inherit; /* Ensures the image fits nicely without cropping */
     
@@ -97,12 +97,12 @@ s
                     
                     
                     <div class="card-body my-2">
-                                    <h5 class="card-title text-center">
+                                    <h6 class="card-title">
                         <a href="{{ route('products.show', $product->id) }}" class="text-decoration-none text-dark">
-                            {{ $product->name }}
+                            <strong>{{ $product->name }}</strong>
                         </a>
-                    </h5>
-                    <div class="d-flex justify-content-center align-items-center gap-2">
+                    </h6>
+                    <div class="d-flex gap-2 align-items-center">
                         <p class="product-price mb-0">${{ number_format($product->price, 2) }}</p>
                         <p class="text-muted small mb-0">⭐⭐⭐⭐⭐ ({{ $product->rating_count }})</p>
                     </div>
