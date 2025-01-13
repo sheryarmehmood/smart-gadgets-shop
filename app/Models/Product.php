@@ -15,4 +15,15 @@ class Product extends Model
     {
         return $this->belongsToMany(Category::class, 'category_product');
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function averageRating()
+    {
+        return $this->reviews()->avg('rating');
+    }
+
 }

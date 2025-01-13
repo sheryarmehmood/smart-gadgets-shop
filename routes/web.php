@@ -3,6 +3,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ReviewController;
 
 // Route::get('/', [ProductController::class, 'index'])->name('home');Route::get('/', function () {
 
@@ -26,16 +27,16 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+    Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
     
-    // Route::get('/payment', [OrderController::class, 'payment'])->name('orders.payment');
-    // Route::post('/payment/process', [OrderController::class, 'processPayment'])->name('orders.processPayment');
-    // Route::get('/order/confirmation', function () {
-    //     return view('order.confirmation');
-    // })->name('orders.confirmation');
-
     Route::get('/payment', [OrderController::class, 'payment'])->name('orders.payment');
     Route::post('/payment/process', [OrderController::class, 'processPayment'])->name('orders.processPayment');
     Route::get('/orders/confirmation', [OrderController::class, 'confirmation'])->name('orders.confirmation');
+
+    //Reviews
+    Route::get('/reviews/create', [ReviewController::class, 'create'])->name('reviews.create');
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
     
 });
 
