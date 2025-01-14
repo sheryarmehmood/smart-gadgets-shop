@@ -25,6 +25,7 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/cart/{id}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/{id}', [CartController::class, 'destroy'])->name('cart.destroy');
 
+    Route::get('/orders/confirmation', [OrderController::class, 'confirmation'])->name('orders.confirmation');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
@@ -32,7 +33,7 @@ Route::middleware(['auth'])->group(function () {
     
     Route::get('/payment', [OrderController::class, 'payment'])->name('orders.payment');
     Route::post('/payment/process', [OrderController::class, 'processPayment'])->name('orders.processPayment');
-    Route::get('/orders/confirmation', [OrderController::class, 'confirmation'])->name('orders.confirmation');
+    
 
     //Reviews
     Route::get('/reviews/create', [ReviewController::class, 'create'])->name('reviews.create');

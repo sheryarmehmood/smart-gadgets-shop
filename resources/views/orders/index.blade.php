@@ -5,7 +5,7 @@
 
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/products">Home</a></li>
             <li class="breadcrumb-item active" aria-current="page">Orders</li>
         </ol>
     </nav>
@@ -31,8 +31,8 @@
                             <td class="align-middle">{{ $order->id }}</td>
                             <td class="align-middle">${{ number_format($order->total_price, 2) }}</td>
                             <td class="align-middle">{{ ucfirst($order->status) }}</td>
-                            <td class="align-middle text-center">
-                            <a href="{{ route('orders.show', $order->id) }}" class="btn btn-danger btn-sm">View</a>
+                            <td class="align-middle">
+                            <a href="{{ route('orders.show', $order->id) }}" class="btn btn-danger btn-sm">Order Details</a>
                             </td>
                         </tr>
                         @endforeach
