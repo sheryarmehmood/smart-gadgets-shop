@@ -68,11 +68,25 @@ class CartController extends Controller
         return redirect()->route('cart.index')->with('success', 'Cart updated successfully!');
     }
 
+    // public function destroy($id)
+    // {
+    //     Cart::destroy($id);
+    //     return redirect()->route('cart.index')->with('success', 'Item removed from cart.');
+    // }
+
     public function destroy($id)
     {
-        Cart::destroy($id);
-        return redirect()->route('cart.index')->with('success', 'Item removed from cart.');
+        // Find the cart item by the variation_id
+        $cartItem = Cart::where('variation_id', $id)->where('user_id', Auth::id())->first();
+
+        if ($cartItem) {
+            $cartItem->delete(); // Delete the item
+            return redirect()->route('cart.index')->with('success', 'Item removed from cart.');
+        }
+
+        return redirect()->route('cart.index')->with('error', 'Item not found.');
     }
+
 
     // public function update(Request $request, $id)
     // {

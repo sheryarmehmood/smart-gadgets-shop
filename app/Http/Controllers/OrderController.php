@@ -61,10 +61,10 @@ class OrderController extends Controller
     
     public function payment()
     {
-    $cartItems = Cart::where('user_id', Auth::id())->with('product')->get();
-
+    $cartItems = Cart::where('user_id', Auth::id())->with('variation.product')->get();
+    // dd($cartItems);
     $totalPrice = $cartItems->sum(function ($item) {
-        return $item->product->price * $item->quantity;
+        return $item->variation->price * $item->quantity;
     });
 
     return view('payment.index', compact('cartItems', 'totalPrice'));
