@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -8,10 +9,13 @@ class Cart extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'product_id', 'quantity'];
+    protected $fillable = ['user_id', 'variation_id', 'quantity'];
 
-    public function product()
+    /**
+     * Relationship with variation.
+     */
+    public function variation()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Variation::class);
     }
 }
