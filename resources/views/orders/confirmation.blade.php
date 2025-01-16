@@ -24,12 +24,12 @@
                     @foreach ($order->items as $item)
                         <tr>
                             <td class="d-flex align-items-center align-middle">
-                                <img src="{{ asset($item->product->image) }}" alt="{{ $item->product->name }}" class="img-fluid me-3" style="width: 50px; height: 50px;">
-                                {{ $item->product->name }}
+                                <img src="{{ asset($item->variation->product->image) }}" alt="{{ $item->variation->product->name }}" class="img-fluid me-3" style="width: 50px; height: 50px;">
+                                {{ $item->variation->product->name }}
                             </td>
-                            <td class="align-middle">${{ number_format($item->price, 2) }}</td>
+                            <td class="align-middle">${{ number_format($item->variation->price, 2) }}</td>
                             <td class="align-middle">{{ $item->quantity }}</td>
-                            <td class="align-middle">${{ number_format($item->quantity * $item->price, 2) }}</td>
+                            <td class="align-middle">${{ number_format($item->quantity * $item->variation->price, 2) }}</td>
                         </tr>
                     @endforeach
                 </tbody>

@@ -145,6 +145,7 @@ class OrderController extends Controller
     public function processPayment(Request $request)
     {
         // dd($request->all());
+        // dd($request->all());
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
@@ -156,7 +157,7 @@ class OrderController extends Controller
         // Fetch cart items and calculate total
         $cartItems = Cart::where('user_id', Auth::id())->get();
         $totalAmount = $cartItems->sum(function ($item) {
-            return $item->product->price * $item->quantity;
+            return $item->variation->price * $item->quantity;
         });
         $paymentStatus = '';
         try {
@@ -197,9 +198,9 @@ class OrderController extends Controller
             foreach ($cartItems as $cartItem) {
                 OrderItem::create([
                     'order_id' => $order->id,
-                    'product_id' => $cartItem->product_id,
+                    'variation_id' => $cartItem->variation->id,
                     'quantity' => $cartItem->quantity,
-                    'price' => $cartItem->product->price,
+                    'price' => $cartItem->variation->price,
                 ]);
             }
 
@@ -224,9 +225,11 @@ class OrderController extends Controller
 
     public function confirmation()
     {
+        
         $orderId = session('order_id'); // Retrieve the order ID from the session
+        // dd($orderId);
         // $order = Order::with('items')->find($orderId); // Fetch the order and related items
-        $order = Order::with('items.product')->find($orderId);
+        $order = Order::with('items.variation')->find($orderId);
         // dd($order);
 
         if (!$order) {

@@ -16,7 +16,7 @@
         <div class="col-md-6">
             
             <div class="mb-4">
-                
+                {{$cartItems}}
                 <table class="table">
                     <thead>
                         <tr>
@@ -30,19 +30,19 @@
                         @foreach ($cartItems as $item)
                             <tr>
                                 <td class="align-middle">
-                                    <img src="{{ $item->product->image }}" alt="{{ $item->product->name }}" class="img-fluid mx-3" style="width: 100px; height: 80px;">
-                                    {{ $item->product->name }}
+                                    <img src="{{ $item->variation->product->image }}" alt="{{ $item->variation->product->name }}" class="img-fluid mx-3" style="width: 100px; height: 80px;">
+                                    {{ $item->variation->product->name }}
                                 </td>
-                                <td class="align-middle">${{ number_format($item->product->price, 2) }}</td>
+                                <td class="align-middle">${{ number_format($item->variation->price, 2) }}</td>
                                 <td class="align-middle">{{ $item->quantity }}</td>
-                                <td class="align-middle">${{ number_format($item->product->price * $item->quantity, 2) }}</td>
+                                <td class="align-middle">${{ number_format($item->variation->price * $item->quantity, 2) }}</td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
                 <p class="text-end"><strong>Total:</strong> ${{ number_format($totalPrice, 2) }}</p>
                 <p class="text-end"><strong>Shipping:</strong> Free</p>
-                <p class="text-end"><strong>Total:</strong> ${{ number_format($cartItems->sum(fn($item) => $item->product->price * $item->quantity), 2) }}</p>
+                <p class="text-end"><strong>Total:</strong> ${{ number_format($cartItems->sum(fn($item) => $item->variation->price * $item->quantity), 2) }}</p>
             </div>
         </div>
         <div class="col-md-1"></div>
