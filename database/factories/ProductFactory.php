@@ -23,10 +23,8 @@ class ProductFactory extends Factory
         return [
             'name' => $gadget['name'],
             'description' => $this->faker->sentence,
-            'price' => $this->faker->randomFloat(2, 10, 200), // Random price between $10 and $200
-            'stock' => $this->faker->numberBetween(1, 50), // Stock between 1 and 50
+            'price' => $this->faker->numberBetween(30, 90), // Random price between $10 and $200
             'image' => $gadget['image'], // Local image path
-            'color' => $this->faker->randomElement(['Black', 'White']), // Random color
         ];
     }
 }
