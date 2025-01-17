@@ -9,6 +9,111 @@
     .fa-star.checked {
         color: gold;
     }
+
+    .breadcrumb {
+        background: none;
+        padding: 0;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: '/';
+    }
+
+    .product-title {
+        font-weight: bold;
+        font-size: 28px;
+    }
+
+    .product-rating i.fa-star {
+        font-size: 16px;
+    }
+
+    .product-rating .checked {
+        color: gold;
+    }
+
+    .product-price {
+        font-size: 24px;
+        font-weight: bold;
+        color: #dc3545;
+    }
+
+    .product-description {
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .variant-options {
+        margin: 20px 0;
+    }
+
+    .variant-label {
+        font-weight: bold;
+        margin-right: 10px;
+    }
+
+    .color-button {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 1px solid #ccc;
+        margin-right: 10px;
+        display: inline-block;
+        cursor: pointer;
+        transition: border-color 0.2s;
+    }
+
+    .color-button.active {
+        border-color: #dc3545;
+    }
+
+    .size-button {
+        width: 30px;
+        height: 30px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-right: 15px;
+        display: inline-block;
+        text-align: center;
+        line-height: 30px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: border-color 0.2s;
+    }
+
+    .size-button.active {
+        border-color: #dc3545;
+    }
+
+    .quantity-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .add-to-cart {
+        background-color: #dc3545;
+        color: white;
+        font-weight: bold;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .info-box {
+        margin-top: 20px;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .info-box i {
+        margin-right: 8px;
+    }
 </style>
 
 <div class="container py-5">
@@ -31,7 +136,8 @@
         <!-- Product Details Section -->
         <div class="col-md-6">
             <h1 class="product-title">{{ $product->name }}</h1>
-            <div class="product-rating mb-3">
+
+            <div class="product-rating mb-2">
                 @php
                     $averageRating = $product->reviews->avg('rating') ?? 0;
                 @endphp
@@ -43,47 +149,47 @@
                 <span class="text-muted">({{ $product->reviews->count() }} Reviews)</span>
             </div>
 
-            <!-- Product Price -->
-            <div class="product-price mt-3">
-                <h2 class="text-danger" id="product-price">${{ number_format($product->price, 2) }}</h2>
-            </div>
+            <div class="product-price mb-3" id="product-price">${{ number_format($product->price, 2) }}</div>
 
-            <p class="product-description mt-3">{{ $product->description }}</p>
+            <p class="product-description">{{ $product->description }}</p>
 
-            <!-- Product Variants -->
-            <form id="variant-form">
-                @csrf
-                <input type="hidden" id="product-id" value="{{ $product->id }}">
-
-                <div class="form-group mt-4">
-                    <label for="color">Color:</label>
-                    <select id="color" class="form-control" name="color" required>
-                        <option value="" disabled selected>Select Color</option>
+            <!-- Product Variations -->
+            <div class="variant-options">
+                <div class="variant-section">
+                    <span class="variant-label">Colours:</span>
+                    <div id="color-options">
                         @foreach ($product->variations->unique('color') as $variation)
-                            <option value="{{ $variation->color }}">{{ ucfirst($variation->color) }}</option>
+                            <div class="color-button" 
+                                data-color="{{ $variation->color }}" 
+                                style="background-color: {{ $variation->color }}"></div>
                         @endforeach
-                    </select>
+                    </div>
                 </div>
 
-                <div class="form-group mt-4">
-                    <label for="size">Size:</label>
-                    <select id="size" class="form-control" name="size" disabled required>
-                        <option value="" disabled selected>Select Size</option>
-                    </select>
+                <div class="variant-section mt-3">
+                    <span class="variant-label">Size:</span>
+                    <div id="size-options">
+                        <!-- Sizes will be populated dynamically on page load -->
+                    </div>
                 </div>
-            </form>
+            </div>
 
             <!-- Quantity Selector and Add to Cart -->
             <form action="{{ route('cart.store') }}" method="POST">
                 @csrf
                 <input type="hidden" name="product_id" value="{{ $product->id }}">
                 <input type="hidden" name="variation_id" id="variation-id">
-                <div class="form-group d-flex align-items-center mt-4">
-                    <label for="quantity" class="me-2">Quantity:</label>
-                    <input type="number" name="quantity" value="1" min="1" class="form-control w-25 me-3">
-                    <button type="submit" class="btn btn-danger" id="add-to-cart-btn" disabled>ADD TO CART</button>
+
+                <div class="quantity-section mt-5">
+                    <input type="number" name="quantity" value="1" min="1" class="form-control" style="width: 70px;text-align:center;">
+                    <button type="submit" class="add-to-cart" id="add-to-cart-btn" disabled>ADD TO CART</button>
                 </div>
             </form>
+
+            <div class="info-box">
+                <p><i class="bi bi-truck"></i> Free Delivery</p>
+                <p><i class="bi bi-arrow-repeat"></i> 30 Days Return Policy</p>
+            </div>
         </div>
     </div>
 
@@ -93,7 +199,7 @@
             <h3>Customer Reviews</h3>
 
             @if($product->reviews->isEmpty())
-                <p>No reviews yet !</p>
+                <p>No reviews yet!</p>
             @else
                 @foreach($product->reviews as $review)
                     <div class="review border p-3 mb-3 rounded">
@@ -108,51 +214,70 @@
                     </div>
                 @endforeach
             @endif
-
-            <!-- <a href="{{ route('reviews.create', ['product_id' => $product->id]) }}" class="btn btn-primary mt-3">Write a Review</a> -->
         </div>
     </div>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const colorSelect = document.getElementById('color');
-        const sizeSelect = document.getElementById('size');
+        const colorOptions = document.getElementById('color-options');
+        const sizeOptions = document.getElementById('size-options');
         const productPrice = document.getElementById('product-price');
         const variationIdField = document.getElementById('variation-id');
         const addToCartButton = document.getElementById('add-to-cart-btn');
 
-        // Update size dropdown based on color selection
-        colorSelect.addEventListener('change', function () {
-            const selectedColor = colorSelect.value;
-            sizeSelect.disabled = false;
-            sizeSelect.innerHTML = '<option value="" disabled selected>Select Size</option>';
+        const variations = @json($product->variations);
 
-            const variations = @json($product->variations);
+        // Display sizes for the first color on page load
+        const firstColor = variations[0].color;
+        const sizesForFirstColor = variations.filter(variant => variant.color === firstColor);
 
-            variations.forEach(variant => {
-                if (variant.color === selectedColor) {
-                    const option = document.createElement('option');
-                    option.value = variant.id; // Use variation ID for the option value
-                    option.textContent = variant.size;
-                    option.dataset.price = variant.price;
-                    sizeSelect.appendChild(option);
-                }
-            });
+        const sizeAbbreviations = {
+            'Small': 'S',
+            'Medium': 'M',
+            'Large': 'L'
+        };
+
+        sizesForFirstColor.forEach(variant => {
+            const button = document.createElement('div');
+            button.classList.add('size-button');
+            button.dataset.id = variant.id;
+            button.dataset.price = variant.price;
+            button.textContent = sizeAbbreviations[variant.size] || variant.size.toUpperCase();
+            sizeOptions.appendChild(button);
         });
 
-        // Update price and enable add-to-cart button when size is selected
-        sizeSelect.addEventListener('change', function () {
-            const selectedOption = sizeSelect.options[sizeSelect.selectedIndex];
-            if (selectedOption) {
-                const price = selectedOption.dataset.price;
-                const variationId = selectedOption.value;
+        colorOptions.addEventListener('click', function (e) {
+            if (e.target.classList.contains('color-button')) {
+                document.querySelectorAll('.color-button').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                const selectedColor = e.target.dataset.color;
 
-                // Update price and variation ID
+                sizeOptions.innerHTML = '';
+                addToCartButton.disabled = true;
+
+                const sizes = variations.filter(variant => variant.color === selectedColor);
+                sizes.forEach(variant => {
+                    const button = document.createElement('div');
+                    button.classList.add('size-button');
+                    button.dataset.id = variant.id;
+                    button.dataset.price = variant.price;
+                    button.textContent = sizeAbbreviations[variant.size] || variant.size.toUpperCase();
+                    sizeOptions.appendChild(button);
+                });
+            }
+        });
+
+        sizeOptions.addEventListener('click', function (e) {
+            if (e.target.classList.contains('size-button')) {
+                document.querySelectorAll('.size-button').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+
+                const price = e.target.dataset.price;
+                const variationId = e.target.dataset.id;
+
                 productPrice.textContent = `$${parseFloat(price).toFixed(2)}`;
                 variationIdField.value = variationId;
-
-                // Enable the Add to Cart button
                 addToCartButton.disabled = false;
             }
         });
