@@ -18,6 +18,6 @@
             <p>{{ $review->comment }}</p>
         </div>
     @empty
-        <p>No reviews yet. Be the first to review this product!</p>
+        <p>No reviews yet !</p>
     @endforelse
 </div>

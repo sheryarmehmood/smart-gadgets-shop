@@ -34,13 +34,13 @@
                     @foreach($order->items as $item)
                     <tr>
                         <td class="align-middle">
-                        <img src="{{ asset($item->product->image) }}" alt="{{ $item->product->name }}" class="img-fluid mx-3" style="width: 100px; height: 80px;">
-                        {{ $item->product->name }}
+                        <img src="{{ asset($item->variation->product->image) }}" alt="{{ $item->variation->product->name }}" class="img-fluid mx-3" style="width: 100px; height: 80px;">
+                        {{ $item->variation->product->name }}
                         </td>
                         <td class="align-middle">{{ $item->quantity }}</td>
-                        <td class="align-middle">${{ number_format($item->price, 2) }}</td>
+                        <td class="align-middle">${{ number_format($item->variation->price, 2) }}</td>
                         <td class="align-middle">
-                        <a href="{{ route('reviews.create', ['product_id' => $item->product->id, 'order_id' => $order->id]) }}" class="btn btn-danger btn-sm">Share Review</a>
+                        <a href="{{ route('reviews.create', ['product_id' => $item->variation->product->id, 'order_id' => $order->id]) }}" class="btn btn-danger btn-sm">Share Review</a>
                         </td>
                     </tr>
                     @endforeach

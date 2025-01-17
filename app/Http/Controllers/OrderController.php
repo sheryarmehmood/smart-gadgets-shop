@@ -23,11 +23,11 @@ class OrderController extends Controller
 
     public function show($id)
     {
-    $order = Order::with('items.product')
+    $order = Order::with('items.variation.product')
         ->where('id', $id)
         ->where('user_id', auth()->id())
         ->firstOrFail();
-
+    // dd($order);
     return view('orders.show', compact('order'));
     }
 

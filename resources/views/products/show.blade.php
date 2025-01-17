@@ -93,7 +93,7 @@
             <h3>Customer Reviews</h3>
 
             @if($product->reviews->isEmpty())
-                <p>No reviews yet. Be the first to review this product!</p>
+                <p>No reviews yet !</p>
             @else
                 @foreach($product->reviews as $review)
                     <div class="review border p-3 mb-3 rounded">
@@ -109,7 +109,7 @@
                 @endforeach
             @endif
 
-            <a href="{{ route('reviews.create', ['product_id' => $product->id]) }}" class="btn btn-primary mt-3">Write a Review</a>
+            <!-- <a href="{{ route('reviews.create', ['product_id' => $product->id]) }}" class="btn btn-primary mt-3">Write a Review</a> -->
         </div>
     </div>
 </div>
