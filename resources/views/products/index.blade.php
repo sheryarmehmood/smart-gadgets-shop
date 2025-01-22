@@ -67,6 +67,14 @@
         color: #999;
         text-decoration: line-through;
     }
+
+    .fa-star {
+        color: gray;
+    }
+
+    .fa-star.checked {
+        color: gold;
+    }
 </style>
 
 <div class="container-fluid px-0">
@@ -99,7 +107,18 @@
                             </h6>
                             <div class="d-flex justify-content-center align-items-center gap-2">
                                 <p class="product-price mb-0">${{ number_format($product->price, 2) }}</p>
-                                <p class="text-muted small mb-0">⭐⭐⭐⭐⭐ ({{ $product->rating_count }})</p>
+                                <!-- <p class="text-muted small mb-0">⭐⭐⭐⭐⭐ ({{ $product->rating_count }})</p> -->
+                                <div class="product-rating mb-2">
+                                    @php
+                                        $averageRating = $product->reviews->avg('rating') ?? 0; // Calculate average rating
+                                    @endphp
+                                    <span class="text-warning">
+                                        @for ($i = 1; $i <= 5; $i++)
+                                            <i class="fa fa-star {{ $i <= $averageRating ? 'checked' : '' }}"></i>
+                                        @endfor
+                                    </span>
+                                    <!-- <span class="text-muted">({{ $product->reviews->count() }} Reviews)</span> -->
+                                </div>
                             </div>
                         </div>
                     </div>
