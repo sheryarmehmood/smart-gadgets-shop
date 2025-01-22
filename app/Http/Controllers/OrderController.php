@@ -10,6 +10,7 @@ use Stripe\Stripe;
 use Stripe\PaymentIntent;
 use Stripe\Charge;
 use Stripe\Exception\ApiErrorException;
+use App\Models\Product;
 
 class OrderController extends Controller
 {
@@ -236,12 +237,29 @@ class OrderController extends Controller
             return redirect()->route('home')->withErrors(['error' => 'Order not found']);
         }
 
+        // Get the categories of the first product in the order
+    $categories = $order->items->first()->variation->product->categories ?? collect();
+
+    // Fetch related products from the same categories (excluding products in the order)
+    $productIdsInOrder = $order->items->pluck('variation.product_id');
+    // dd($productIdsInOrder);
+    
+    $relatedProducts = Product::whereHas('categories', function ($query) use ($categories) {
+        $query->whereIn('categories.id', $categories->pluck('id')); // Explicitly qualify 'categories.id'
+    })
+    ->whereNotIn('products.id', $productIdsInOrder) // Explicitly qualify 'products.id'
+    ->take(4)
+    ->get();
+
+        // dd($relatedProducts);
+
         return view('orders.confirmation', [
             'order' => $order,
             'customer_name' => session('customer_name'),
             'customer_email' => session('customer_email'),
             'payment_method' => session('payment_method'),
             'total_amount' => session('total_amount', '0.00'),
+            'relatedProducts' => $relatedProducts, // Pass related products to the view
         ]);
     }
 
