@@ -4,7 +4,7 @@
 <div class="container my-2">
     <!-- Order Confirmation Section -->
     <div class="text-center">
-        <h1 class="mt-5 mb-3">Order Confirmed!</h1>
+        <h1 class="mt-5 mb-3">Order Confirmed.!</h1>
         <p>Thank you for your order.</p>
         <p>Your Order (ID: <strong>{{ $order->id }}</strong>) has been confirmed.</p>
     </div>
